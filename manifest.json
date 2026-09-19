@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "WhatsApp Extra E2EE MVP",
+  "version": "0.1.0",
+  "description": "Project skeleton for researching pre-send encryption on WhatsApp Web.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*"
+  ],
+  "background": {
+    "service_worker": "extension/backgroundController.js"
+  },
+  "action": {
+    "default_title": "WhatsApp Extra E2EE",
+    "default_popup": "ui/popup.html"
+  },
+  "options_page": "ui/settings.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.whatsapp.com/*"
+      ],
+      "js": [
+        "extension/whatsapp-adapter.js",
+        "ui/chat-ui.js",
+        "extension/content-script.js"
+      ],
+      "css": [
+        "ui/chat-ui.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+// Extension settings entry point.
