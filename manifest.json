@@ -23,6 +23,7 @@
         "https://web.whatsapp.com/*"
       ],
       "js": [
+        "crypto/crypto.js",
         "extension/whatsapp-adapter.js",
         "ui/chat-ui.js",
         "extension/content-script.js"
