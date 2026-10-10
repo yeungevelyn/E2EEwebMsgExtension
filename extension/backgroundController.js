@@ -1,4 +1,6 @@
 // Chrome extension background entry point.
+import "../crypto/keyManager.js";
+
 let enabled = true;
 let cryptoReady = false;
 
