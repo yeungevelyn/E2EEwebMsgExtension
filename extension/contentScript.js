@@ -24,6 +24,20 @@ async function initialiseMessageInput() {
 
     console.log("[E2EE] Message input found");
 
+    // locating displayed messages
+    const displayedMessages =
+        whatsappAdapter.getDisplayedMessages();
+
+    console.log(
+        "[E2EE] Displayed message count:",
+        displayedMessages.length
+    );
+
+    console.log(
+        "[E2EE] Displayed message elements:",
+        displayedMessages
+    );
+
     messageInput.addEventListener("input", () => {
         console.log(
             "[E2EE] Current input:",
@@ -41,6 +55,36 @@ function initialiseMessageSend() {
         if (!sendButton || !sendButton.contains(event.target)) {
             return;
         }
+
+        // detect active conversation, using display name as temporary id
+        const activeConversation =
+            whatsappAdapter.getActiveConversation();
+
+        console.log(
+            "[E2EE] Active conversation:",
+            activeConversation
+        );
+
+        const plaintext =
+            whatsappAdapter.readInputContent();
+
+        console.log(
+            "[E2EE] Input before send:",
+            plaintext
+        );
+
+        const originalText =
+            whatsappAdapter.readInputContent();
+
+        const replaced =
+            whatsappAdapter.replaceInputContent(
+                `[TEST] ${originalText}`
+            );
+
+        console.log(
+            "[E2EE] Input replaced:",
+            replaced
+        );
 
         console.log("[E2EE] Send button clicked");
 
