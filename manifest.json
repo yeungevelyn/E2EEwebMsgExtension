@@ -10,7 +10,8 @@
     "https://web.whatsapp.com/*"
   ],
   "background": {
-    "service_worker": "extension/backgroundController.js"
+    "service_worker": "extension/backgroundController.js",
+    "type": "module"
   },
   "action": {
     "default_title": "WhatsApp Extra E2EE",
@@ -24,9 +25,9 @@
       ],
       "js": [
         "crypto/crypto.js",
-        "extension/whatsapp-adapter.js",
+        "extension/whatsappAdapter.js",
         "ui/chat-ui.js",
-        "extension/content-script.js"
+        "extension/contentScript.js"
       ],
       "css": [
         "ui/chat-ui.css"
