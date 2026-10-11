@@ -18,6 +18,7 @@ src/
 |   |-- content-script.js
 |   `-- whatsapp-adapter.js
 |-- crypto/
+|   |-- keyManager.js
 |   `-- crypto.js
 |-- ui/
 |   |-- chat-ui.js
@@ -41,6 +42,9 @@ extension/backgroundController.js
 
 crypto/crypto.js
     Empty cryptography module placeholder.
+
+crypto/keyManager.js
+    Empty Key manager module placeholder.
 
 extension/whatsapp-adapter.js
     Empty WhatsApp integration module placeholder.
