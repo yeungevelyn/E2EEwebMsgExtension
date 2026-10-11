@@ -1,13 +1,44 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="eng">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="popup.css">
-  <title>E2EE Extension</title>
+    <meta charset="UTF-8">
+    <title>Secure Chat Extension</title>
+    <link rel="stylesheet" href="popup.css">
+
 </head>
 <body>
-  <h1>E2EE Extension</h1>
-  <script src="popup.js"></script>
+    <h1>Secure Chat</h1>
+    <p>End-to-End Encryption Extension</p>
+
+    <h2>Encryption Control</h2>
+
+    <label for="encryptionToggle">
+        Enable Encryption
+    </label>
+    <input type="checkbox" id="encryptionToggle">
+
+    <p>
+        Encryption setting: <span id="encryptionStatus">Disabled</span>
+    </p>
+
+    <h2>Your Public Key</h2>
+
+    <textarea id="publicKey" row="4" readonly
+        placeholder="No public key available"></textarea>
+
+    <button id="copyPublicKey">Copy Public Key</button>
+
+    <h2>Recipient's Public Key</h2>
+
+    <p>Paste the public key shared by your messaging contact.</p>
+
+    <textarea id="recipientPublicKey" rows="4"
+        placeholder="Paste recipient's public key here"></textarea>
+
+    <button id="saveRecipientKey">Save Recipient Key</button>
+
+    <p id="recipientKeyMessage"></p>
+
+    <script src="popup.js"></script>
 </body>
 </html>
