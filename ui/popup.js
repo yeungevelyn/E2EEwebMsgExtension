@@ -30,6 +30,8 @@ chrome.storage.local.get(["encryptionEnabled"], function (result){
 });
 
 const publicKey = document.getElementById("publicKey");
+// Temporary demo key for testing the popup only.
+publicKey.value = "E2EE-PUB-87654321";
 const copyButton = document.getElementById("copyPublicKey");
 
 copyButton.addEventListener("click", async function () {
@@ -80,7 +82,7 @@ saveRecipientKey.addEventListener("click", function () {
     }, function () {
          if (chrome.runtime.lastError) {
             recipientKeyMessage.className = "error";
-            
+
             recipientKeyMessage.textContent =
                 "Unable to save the recipient's public key.";
             return;
@@ -98,4 +100,3 @@ chrome.storage.local.get(["recipientPublicKey"], function (result) {
         recipientPublicKey.value = result.recipientPublicKey;
     }
 });
-
