@@ -131,13 +131,28 @@ The approach/methodology section describes the methods and materials that you in
 You can additionally mention others, but you must at least mention the following points in each subsection.
 
 \subsection{Project Challenges}
+ \textbf{Authenticated Key Exchange}
+ One of the main challenges of this project is implementing an authenticated key exchange mechanism. This involves two key difficulties. First, during the initial exchange of public keys, the system must ensure that the received public key genuinely belongs to the intended user rather than to a man-in-the-middle attacker. Without a reliable authentication mechanism, an attacker could intercept the communication and replace the users’ public keys with their own.
+ Second, the initial version of the system will use a manual key exchange process, in which Alice sends her public key directly to Bob. Although this approach is relatively straightforward to implement, the ultimate goal is to automate the key exchange process while maintaining the authenticity and security of the exchanged public keys. Designing a secure and user-friendly transition from manual to automatic key exchange will therefore be an important technical challenge.
 
-Summarize all challenges or difficulties in this project and how you plan to solve them.
+ To address these challenges, the system will use two levels of cryptographic keys: long-term identity keys and conversation-specific ephemeral keys. During the initial authentication process, a human-readable verification code will be generated from the fingerprint of each user’s long-term public key. Alice and Bob will compare this code through an out-of-band channel other than WhatsApp. This allows them to verify that the long-term public keys genuinely belong to the intended users. Certificate-based authentication may also be considered as an alternative if a suitable trust model is available.
 
- 
+ After the users’ long-term identities have been verified, the system will support automatic session-key establishment for individual WhatsApp conversations. When a user opens a conversation, the extension will obtain the conversation ID from the WhatsApp platform. This ID will be used to identify the conversation and to create or retrieve a conversation-specific ephemeral X25519 key pair. The extension will then automatically exchange the ephemeral public keys between the two participants.
+
+ After receiving the other participant’s ephemeral public key, each party will use X25519 to calculate the same shared secret. HKDF will derive a temporary message-encryption key from this shared secret. The WhatsApp conversation ID, together with the participants’ identities and relevant protocol information, will be included in the key-derivation context. As a result, the derived message key will be cryptographically bound to the intended WhatsApp conversation and will not be directly reusable in another conversation.
+
+ \textbf{Group Messaging Encryption}
+ Another significant challenge is implementing end-to-end encryption for group conversations. Unlike a one-to-one conversation, a group conversation involves multiple participants, which makes key distribution and management more complex. The system must securely establish a shared group key and ensure that it is available only to authenticated group members.
+
+ Group membership may change over time. When a new participant joins, the system must securely distribute the necessary keying material without allowing the new member to decrypt messages sent before they joined. When a participant leaves or is removed, a new group key must be generated and securely distributed to the remaining members so that the former member cannot decrypt future messages. Therefore, the system must support secure and efficient key rotation whenever group membership changes.
+
+ The group key will be used to derive the temporary message-encryption key for the corresponding WhatsApp group conversation. The WhatsApp conversation ID and relevant protocol information will be incorporated into the key-derivation context to bind the derived key to the intended group. Designing a mechanism that supports authenticated membership, secure group-key distribution, membership changes, and automatic key updates will therefore be an important technical challenge.
+
+ Due to its additional complexity, group messaging encryption may be implemented after the one-to-one messaging and key-establishment mechanisms have been successfully developed and evaluated.
 
 
-\subsection{Plan and Time Line}
+
+ \subsection{Plan and Time Line}
 
 ~~
 
