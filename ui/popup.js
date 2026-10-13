@@ -75,48 +75,47 @@ const saveRecipientKey = document.getElementById("saveRecipientKey");
 
 const recipientKeyMessage = document.getElementById("recipientKeyMessage");
 
-saveRecipientKey.addEventListener("click", function () {
+saveRecipientKey.addEventListener("click", async function () {
     const key = recipientPublicKey.value.trim();
 
-    if (key === ""){
+    if (key === "") {
         recipientKeyMessage.className = "error";
-
-        recipientKeyMessage.textContent = 
+        recipientKeyMessage.textContent =
             "Please enter the recipient's public key.";
         return;
     }
 
-    const keyPattern = /^E2EE-PUB-\d{8}$/;
+    try {
+        await E2EEKeyManager.savePeerPublicKey(key);
 
-    if (!keyPattern.test(key)) {
-        recipientKeyMessage.className = "error";
-
-        recipientKeyMessage.textContent = 
-            "Invalid demo key format.";
-        return;
-    }
-
-    
-    chrome.storage.local.set({
-        recipientPublicKey: key
-    }, function () {
-         if (chrome.runtime.lastError) {
-            recipientKeyMessage.className = "error";
-
-            recipientKeyMessage.textContent =
-                "Unable to save the recipient's public key.";
-            return;
-    }
         recipientKeyMessage.className = "success";
-
         recipientKeyMessage.textContent =
             "Recipient's public key saved successfully.";
-    });
-});
 
+    } catch (error) {
+        console.error("Unable to import recipient key:", error);
 
-chrome.storage.local.get(["recipientPublicKey"], function (result) {
-    if (result.recipientPublicKey) {
-        recipientPublicKey.value = result.recipientPublicKey;
+        recipientKeyMessage.className = "error";
+        recipientKeyMessage.textContent =
+            "Invalid public key. Please check the key and try again.";
     }
 });
+
+async function loadRecipientKey() {
+    try {
+        const savedKey = await E2EEKeyManager.loadPeerPublicKey();
+
+        if (savedKey) {
+            recipientPublicKey.value = savedKey.bundle;
+        }
+
+    } catch (error) {
+        console.error("Unable to load recipient key:", error);
+
+        recipientKeyMessage.className = "error";
+        recipientKeyMessage.textContent =
+            "Unable to load the saved recipient key.";
+    }
+}
+
+loadRecipientKey();
