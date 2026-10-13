@@ -30,8 +30,28 @@ chrome.storage.local.get(["encryptionEnabled"], function (result){
 });
 
 const publicKey = document.getElementById("publicKey");
-// Temporary demo key for testing the popup only.
-publicKey.value = "E2EE-PUB-87654321";
+
+async function loadPublicKey() {
+    try {
+        // Load an existing key pair or generate one if none exists.
+        const keyPair = await E2EEKeyManager.getOrCreateIdentityKeyPair();
+
+        // Convert the public key into text that can be shared.
+        const publicKeyText = await E2EEKeyManager.exportPublicKeyBundle(
+            keyPair.publicKey
+        );
+
+        // Display the real public key in the popup.
+        publicKey.value = publicKeyText;
+
+    } catch (error) {
+        console.error("Unable to load public key:", error);
+        publicKey.value = "";
+        alert("Unable to load your public key.");
+    }
+}
+
+loadPublicKey();
 const copyButton = document.getElementById("copyPublicKey");
 
 copyButton.addEventListener("click", async function () {
