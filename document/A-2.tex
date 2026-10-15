@@ -16,7 +16,9 @@
 \usepackage{times}
 \usepackage{hyperref}
 \usepackage{ulem}
-
+\usepackage{tabularx}
+\usepackage{pgfgantt}
+\usepackage{float}
 \topmargin -0.5cm \oddsidemargin 0cm \evensidemargin 0cm \textheight
 22cm \textwidth 16cm
 
@@ -35,7 +37,7 @@
 
 
 \author{
-Name 1\\
+ Yining Yang 89628688\\\
 Name 2\\
 Name 3\\
 Name 4\\
@@ -65,7 +67,7 @@ You must edit the proposal in this template, not other templates. Pls contact Fu
 \begin{center}
 \begin{tabular}{cc}\hline
 Names & Weights \\ 
-Name 1 &  100$\%$ \\
+Yining Yang &  100$\%$ \\
 Name 2 &  100$\%$ \\
 Name 3 &  100$\%$ \\
 Name 4 &  90$\%$ \\
@@ -153,8 +155,68 @@ You can additionally mention others, but you must at least mention the following
 
 
  \subsection{Plan and Time Line}
+ The project will be developed in two phases. Phase~1 will deliver a minimum viable product (MVP) that demonstrates the complete one-to-one encryption workflow. It is expected to require three weeks of development, followed by one week of float for integration, testing, and documentation.
 
-~~
+ During the first week of Phase~1, the team will establish communication between the extension components, integrate the extension with the WhatsApp Web interface, implement basic key-pair generation, and create the popup interface. The second week will focus on manual public-key exchange, shared-key derivation, outgoing-message interception, AES-GCM encryption, and the initial chat interface. During the third week, the team will implement incoming-message detection, decryption, local key handling, error processing, and interface integration. The fourth week will be reserved for end-to-end testing, defect correction, evaluation, and documentation. The expected
+ outcome of this phase is a functional Chrome extension that demonstrates one-to-one encrypted messaging on WhatsApp Web.
+
+ Phase~2 will build on the MVP by improving its security, usability, reliability, and support for multiple conversations and encrypted group messaging. This phase is expected to require eight weeks of development, followed by two weeks of float and finalisation.
+
+ Phase~2 will begin with an assessment of the MVP and the design of the conversation and key-management models. The extension will identify the active WhatsApp conversation through its conversation ID and associate each conversation with the correct cryptographic state. Subsequent development will cover automatic public-key exchange, authenticated key establishment, secure local key storage, multi-contact key isolation, versioned encrypted message formats, key rotation, and replay protection.
+
+ The prototype will then be extended to support encrypted group conversations and improve the handling of replies, forwarded messages, edited messages, conversation changes, and WhatsApp interface updates. The user interface will display the active contact, encryption status, public-key fingerprint, verification status, and key-change warnings. The final development period
+ will focus on module integration, security testing, performance evaluation, cross-browser compatibility, documentation, and preparation of the final demonstration.
+
+ The allocated float periods will be used to address implementation delays, integration problems, and defects discovered during testing. The Phase~1 MVP will be treated as the core deliverable, while the Phase~2 improvements will be implemented according to their priority and technical feasibility.
+
+ \begin{figure}[H]
+  \centering
+
+  \resizebox{0.95\textwidth}{!}{%
+   \begin{ganttchart}[
+    hgrid,
+    vgrid,
+    title height=1,
+    title label font=\bfseries\small,
+    bar label font=\small,
+    group label font=\bfseries\small,
+    milestone label font=\small,
+    bar height=0.55,
+    group height=0.4,
+    group peaks height=0.15,
+    group peaks width=0.10,
+    group/.append style={fill=blue!45},
+    bar/.append style={fill=blue!25},
+    milestone/.append style={fill=red!70}
+   ]{1}{14}
+
+    \gantttitle{Project Week}{14} \\
+    \gantttitlelist{1,...,14}{1} \\
+
+    \ganttgroup{Phase 1 MVP}{1}{4} \\
+    \ganttbar{Architecture and WhatsApp DOM integration}{1}{1} \\
+    \ganttbar{Key exchange and outgoing encryption}{1}{2} \\
+    \ganttbar{Incoming decryption and UI integration}{2}{3} \\
+    \ganttbar{MVP testing documentation and float}{4}{4} \\
+    \ganttmilestone{MVP completed}{4} \\
+
+    \ganttgroup{Phase 2 Security and Usability}{5}{13} \\
+    \ganttbar{Key Rotation, storage protection and core Integration }{5}{5} \\
+    \ganttbar{Multi-contact and conversation-specific keys}{6}{6} \\
+    \ganttbar{Encrypted group messaging}{7}{8} \\
+    \ganttbar{User-friendly interface and browser compatibility}{9}{9} \\
+    \ganttbar{Authenticated automatic key exchange}{10}{10}\\
+    \ganttbar{Integration security and performance testing}{11}{11} \\
+    \ganttbar{Technical float and stabilisation}{12}{12} \\
+    \ganttbar{Final validation documentation and demonstration}{13}{13} \\
+    \ganttmilestone{Final prototype completed}{13}
+
+   \end{ganttchart}%
+  }
+
+  \caption{Proposed project development timeline}
+  \label{fig:project-gantt-chart}
+ \end{figure}
 
 
 ~\\
