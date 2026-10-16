@@ -82,38 +82,38 @@ Name 6&  100$\%$ \\ \hline
 
 \section{\tb{Introduction}}
 
-\tr{
-\begin{itemize}
-\item The project proposal must have at least 10 pages including the title page but excluding references. 
-\item You can insert some pics or tables to further explain what you are going to introduce. 
-\item You must study how to cite references.  Note that part of contents of this proposal are allowed to be directly used in your final report.
-\item You are not allowed to change the format or font size of this Latex template.
-\item You can add other sections or subsections if needed.
-\end{itemize}
-}
+Digital messaging platforms are extensively utilized to share personal, academic, and professional information, and ensuring the confidentiality and integrity of sensitive messages has become a major security concern. To address this concern, end-to-end encryption (E2EE) is used, which encrypts message content on the sender’s device so that only the intended recipient can decrypt it. However, the security of a messaging workflow relies not just on the encryption algorithm, but also on how keys are generated, exchanged, stored, and associated with the correct users.
 
-\medskip
+WhatsApp already provides end-to-end encryption for personal messages and calls. This project does not aim to replace these security methods or suggest that WhatsApp is insecure. Instead, it examines the design of a Chrome browser extension that adds an experimental, extra encryption layer to text messages exchanged through WhatsApp Web. The project explores adding client-side cryptographic processing to an existing web messaging interface by encrypting messages within the browser before sending. The extension is designed as a prototype to study encryption workflows, key handling, and the practical challenges of embedding security functionality into a dynamic website.
 
+The initial phase concentrates on a minimum viable product (MVP). Through a popup interface, users will be able to enable or disable the extension, generate cryptographic key pairs, and manually exchange public keys. The extension will use Elliptic-Curve Diffie–Hellman (ECDH) key agreement to derive a shared secret, which will be used for message encryption and decryption with AES-GCM. When a message is sent, the extension will detect the send action, intercept the plaintext, encrypt it, and replace it with a ciphertext string before transmission through WhatsApp Web. On the receiving end, it will identify encrypted messages, decrypt them, and display the resulting plaintext to the recipient. The popup will also contain key-related controls and show the status of the extension.
 
-There are many ways of introducing the background of your project. Here, I introduce one template (You don't need to exactly follow this template):
+A key challenge is that encryption alone does not guarantee that keys have been exchanged with the intended party. Because public keys are exchanged manually in the MVP, the workflow is straightforward to demonstrate but offers no independent authentication of the other participant’s identity. If an attacker substitutes a public key during the exchange, users may derive a secret with the wrong party, creating a potential man-in-the-middle risk. Key authentication and management must therefore be considered alongside message encryption. The project must also address practical integration issues, including changes to the WhatsApp Web interface, reliable detection of message events, and clear handling of decryption failures, since the extension must coordinate cryptographic operations with an interface it does not control.
 
-The introduction can be seen as the extension of the abstract.
-\begin{itemize}
-\item Introduce the background of problem you are going to mention.
-
-\item Introduce the problem (why this is important)
-
-
-\item Briefly introduce and summarize related solutions, and identify the gaps. Put the detailed introductions in the related work.
-
-
-\item Introduce the aims in the subsection in details.
-
-\item  Introduce related work  in the subsection in details.
-\end{itemize}
+The second phase is to improve the prototype’s security, reliability, and usability. Prospective work includes better key authentication, per-contact key management, key rotation, group messaging, secure local key storage, improved message handling, and security and performance testing. These are planned extensions, not features assumed to be in the MVP. Evaluation will check whether the core workflow works as intended and highlight limitations in the implementation. Overall, the project provides a step-by-step approach to implementing and evaluating an extra client-side encryption layer for WhatsApp Web, demonstrating its main workflow, and identifying the limitations that must be addressed before a more comprehensive implementation is considered.
 
 
 \subsection{Aims}
+
+The main goal of this project is to create, develop and test a Chrome browser extension that illustrates a new client-side layer of encryption for the text messages sent and received via WhatsApp Web. Content of the message will be handled in the browser but without using a server to store users' cryptographic keys. The project has been split into an initial MVP and a subsequent portion of foreseen security and usability improvements.
+
+The following specific aims are to:
+
+\begin{enumerate}
+    \item \textbf{Develop the extension interface and integration.} Include a pop-up to allow users to either enable or disable the extension, as well as access public-key exchange controls and view the encryption status; and integrate the extension into WhatsApp Web's message-sending and message-receiving workflow.
+
+    \item \textbf{Implement key establishment.} Create key pairs, import/export public keys manually, and use ECDH key agreement to derive a shared secret between two parties.
+
+    \item \textbf{Encrypt and decrypt text messages.} Use AES-GCM to encrypt outgoing plaintext before it is sent via WhatsApp Web, and decrypt supported incoming ciphertext to read the original message sent by the sender.
+
+    \item \textbf{Test the core MVP workflow.} Confirm public-key export and import, shared-secret agreement, message encryption/decryption, and the handling of relevant message actions and errors.
+
+    \item \textbf{Investigate security limitations and future improvements.} In Phase 2, investigate the problems of public-key substitution and man-in-the-middle attacks in manual public-key exchange, and examine better key authentication and key management, key rotation, group messaging, secure local storage, and better reliability and usability.
+
+    \item \textbf{Evaluate the prototype.} Evaluate the core workflow to determine if it is working as desired, and determine any security, integration, performance, and usability concerns that would guide future development.
+\end{enumerate}
+
+The expected initial outcome is a working prototype demonstrating manual public-key exchange and encrypted text messaging using WhatsApp Web. The features in Phase 2 are treated as planned development and are evaluated according to the project's progress.
 
 \subsection{Related Work}
 
