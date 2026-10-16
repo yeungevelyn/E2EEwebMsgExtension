@@ -3,7 +3,8 @@
 
 const E2EECrypto = (() => {
 
-    
+    const MESSAGE_PREFIX = "E2EE1:";
+
     // creates the temporary symmetric key.
    
     async function generateTestKey() {
@@ -72,21 +73,46 @@ const E2EECrypto = (() => {
             base64ToArrayBuffer(payload.ciphertext);
 
         // Decrypt and verify the message.
-        const decryptedBuffer =
-            await crypto.subtle.decrypt(
-                {
-                    name: "AES-GCM",
-                    iv: iv,
-                    tagLength: 128
-                },
-                key,
-                ciphertext
-            );
+        let decryptedBuffer;
+
+        try {
+            decryptedBuffer =
+                await crypto.subtle.decrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv,
+                        tagLength: 128
+                    },
+                    key,
+                    ciphertext
+                );
+
+        } catch (error) {
+            throw new Error("Message authentication failed.");
+        }
 
         // Convert decrypted bytes back into normal text.
         const decoder = new TextDecoder();
 
         return decoder.decode(decryptedBuffer);
+    }
+
+    // Convert encrypted payload into text for WhatsApp.
+    function encodeMessagePayload(payload) {
+        return MESSAGE_PREFIX + JSON.stringify(payload);
+    }
+
+    // Convert WhatsApp text back into the encrypted payload.
+    function decodeMessagePayload(messageText) {
+
+        if (!messageText.startsWith(MESSAGE_PREFIX)) {
+            throw new Error("Not an encrypted message.");
+        }
+
+        const jsonText =
+            messageText.substring(MESSAGE_PREFIX.length);
+
+        return JSON.parse(jsonText);
     }
 
 
@@ -153,18 +179,37 @@ const E2EECrypto = (() => {
                     originalMessage,
                     key
                 );
+            const whatsappText =
+                encodeMessagePayload(encryptedPayload);
+
+            console.log(
+                "WhatsApp text:",
+                whatsappText
+            );
 
             console.log(
                 "Encrypted payload:",
                 encryptedPayload
             );
+            const decodedPayload =
+                decodeMessagePayload(whatsappText);
+            
+            //modified payload 
+            const changedChar =
+                decodedPayload.ciphertext[0] === "A" ? "B" : "A";
 
+            const modifiedPayload = {
+                ...decodedPayload,
+                ciphertext:
+                    changedChar + decodedPayload.ciphertext.slice(1)
+            };
             // Decrypt.
             const decryptedMessage =
                 await decryptMessage(
-                    encryptedPayload,
-                    key
-                );
+                decodedPayload,
+                key
+            );
+            
 
             console.log(
                 "Decrypted message:",
@@ -178,6 +223,23 @@ const E2EECrypto = (() => {
                 "Encryption/decryption successful:",
                 successful
             );
+            // Test modified ciphertext.
+            try {
+                await decryptMessage(
+                    modifiedPayload ,
+                    key
+                );
+
+                console.log(
+                    "Modified message test failed: message was decrypted."
+                );
+
+            } catch (error) {
+                console.log(
+                    "Modified message test passed:",
+                    error.message
+                );
+            }
 
         } catch (error) {
 
@@ -193,6 +255,8 @@ const E2EECrypto = (() => {
         generateTestKey,
         encryptMessage,
         decryptMessage,
+        encodeMessagePayload,
+        decodeMessagePayload,
         runSelfTest
     };
 
