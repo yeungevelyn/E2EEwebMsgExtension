@@ -237,18 +237,23 @@ Development and testing will use JavaScript, WebExtensions/Chrome extension APIs
 ~\\
 \section{\tb{Outcomes}}
 
-This section should include the expected impacts and benefits of the proposed project. It is important that these be specific and realistic.
+The expected outcome of this project is to develop a functioning browser extension that adds an additional layer of end to end encryption (E2EE) to web based messaging. The extension will be developed for Google Chrome and WhatsApp Web, allowing users to encrypt text messages before they leave the browser and decrypt received messages. This project aims to improve message privacy without needing a separate messaging platform.
 
-Example: “Outcomes of this project will include:
+The following are the outcomes the project is expected to achieve:
 
-\begin{itemize}
-\item a prototype of an engrossing, original computer game of professional standard
+\begin{enumerate}
+    \item \textbf{Functional browser extension:} In the first phase, the extension will support sending and receiving encrypted text messages through WhatsApp Web. It will intercept and encrypt outgoing messages before they are sent, detect incoming encrypted messages and display the decrypted content to the recipient.
 
-\item An academic paper that solves XXX problems.
+    \item \textbf{Key management and message protection:} The extension will generate and store a public and private key pair for each user. Users will exchange public keys manually and use Elliptic Curve Diffie-Hellman (ECDH) to establish a shared secret for deriving encryption keys. AES-GCM will be used to encrypt and decrypt messages. The system will also handle errors such as missing or invalid keys and decryption failures.
 
-\item for team members, valuable insights, enhanced skills and an original work for portfolios.”
-\end{itemize}
+    \item \textbf{User friendly interface:} The popup will allow users to manage encryption settings and show whether encryption is enabled or disabled. Users can also copy their public keys and import a recipient's public key. The interface will display decrypted messages and show relevant error messages when problems occur.
 
+    \item \textbf{Further improvements:} In the second phase, the team plans to improve the security and usability of the extension. This includes strengthening public key verification to help users confirm that a key belongs to the correct person. The team also plans to introduce key rotation and improve key management to support multiple contacts instead of one recipient. Clearer error messages will help users understand problems when using the extension. These improvements will depend on project progress and feasibility.
+
+    \item \textbf{Testing and evaluation:} The team will test whether the extension can successfully encrypt and decrypt messages on WhatsApp Web. The evaluation will also consider security aspects such as key management, the usability and performance of the extension, and deployment challenges associated with integrating additional encryption into an existing messaging platform.
+\end{enumerate}
+
+The project may benefit users who want more privacy when communicating online, companies protecting confidential information and researchers studying browser security and message privacy. One limitation is that users may not be able to verify whether the public keys they exchange belong to the correct recipients. The extension will also depend on WhatsApp Web, so changes to the platform could affect how the extension works.
 
 \section{\tb{Conclusion}}
  
