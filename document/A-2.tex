@@ -40,7 +40,7 @@
  Yining Yang 89628688\\\
  Hazel Dube 9179677\\
  Athulya Shaji 9867600\\
-Name 4\\
+ Mohammed Raiyan Diwan 9967679\\
 Name 5\\
 }
 
@@ -70,7 +70,7 @@ Names & Weights \\
 Yining Yang &  100$\%$ \\
 Hazel Dube &  100$\%$ \\
 Athulya Shaji &  100$\%$ \\
-Name 4 &  90$\%$ \\
+Mohammed Raiyan Diwan &  100$\%$ \\
 Name 5 &  100$\%$ \\
 Name 6&  100$\%$ \\ \hline
 \end{tabular}
@@ -115,12 +115,102 @@ The following specific aims are to:
 
 The expected initial outcome is a working prototype demonstrating manual public-key exchange and encrypted text messaging using WhatsApp Web. The features in Phase 2 are treated as planned development and are evaluated according to the project's progress.
 
+
 \subsection{Related Work}
 
+\paragraph{WhatsApp End-to-End Encryption and Key Transparency.}
 
-Briefly introduce each solution, advantage and disadvantage of each solution.
+WhatsApp makes use of the Signal Protocol to lay down the basis of E2EE (end-to-end encrypted) communication. Meanwhile, the Key Transparency feature helps users ensure that their conversation keys have not been covertly replaced \cite{whatsapp-e2ee,whatsapp-key-transparency}. Auditable Key Directory is created to make it possible to verify the correctness of the directory independently. Automation and large-scale deployment decrease the need for manual verification of security codes. However, all of the mentioned features are incorporated into WhatsApp clients themselves and do not support verification of keys controlled by third-party extensions.
 
-TIPS: You can introduce details about each solution if it is hard for you to write up to 10 pages (from introduction section to the last section without counting references).
+
+\paragraph{Signal Protocol: X3DH and Double Ratchet.}
+The X3DH protocol of the Signal network generates a common key based on authenticated public keys and prekeys published by users, thus allowing communication even if the receiver is not online. The next step in this process is that the Double Ratchet algorithm creates new message keys, updating the encryption state, and providing forward secrecy and post-compromise security \cite{signal-protocol}. This setup provides better security compared to one session key, although the use of prekeys and ratcheting states is required. On the other hand, 
+
+\paragraph{MessageGuard.}
+MessageGuard studies the process of adding content-level encryption to existing web applications using browser-based security overlays. This project provides reusable cryptographic building blocks, key management capabilities, and user interface elements, with evaluations carried out on applications such as Gmail and Facebook Chat \cite{messageguard}. It proves that encryption can be added to an application without having to change the underlying service while at the same time addressing the issue of usability. MessageGuard is, however, more of a generic research tool, and not a WhatsApp extension in particular, and the overlays can be broken with any modifications to the website interface and/or message processing procedure.
+
+\paragraph{EriChain.}
+EriChain is an extension for Chrome/Brave browser used for auditing conversations on WhatsApp Web. This extension makes use of signed hash chain per message, ECDSA signatures, HMAC-based commit keys, acknowledgments, and logs that can be exported to help detect deleted, reordered, or changed messages \cite{erichain}. The use of EriChain as an extension for WhatsApp Web serves as an example of how to implement content scripts and background service workers. However, EriChain deals with integrity and audit problems but not confidentiality since its repository states that messages are not encrypted.
+
+\paragraph{Code Verify.}
+Code Verify is an open source browser extension that is designed to detect anomalies in the code sent by WhatsApp Web. Code Verify is able to accomplish this task via comparison of cryptographic hashes of the sent code against a reference code using the verification procedure that employs Cloudflare \cite{code-verify}. It is a tool for detecting any suspicious changes in the app. However, code verification alone does not mean encryption of the message or authentication of the keys controlled by a separate extension. 
+
+\paragraph{Messaging Layer Security (MLS).}
+Messaging Layer Security (MLS) refers to an IETF standard of an asynchronous group key agreement protocol that supports groups with few members up to those with thousands of members and provides both forward secrecy and post-compromise security  \cite{mls}. This tree structure allows for fast key update upon changes to the group membership, and hence, MLS can act as a good point of reference for future group-messaging implementation. MLS requires coordinated group membership management, message format standardization, and use of epochs to track states. It is not safe to share one AES key since it cannot handle any change in membership or compromised keys.
+
+\subsubsection{Comparison and Proposed Project Contribution}
+
+The reviewed solutions address confidentiality, key verification, message
+integrity, code integrity, and group key management. Table~\ref{tab:related-work}
+summarises their strengths, limitations, and differences from the proposed project.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of related messaging-security solutions}
+    \label{tab:related-work}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \setlength{\tabcolsep}{3pt}
+
+    \begin{tabularx}{0.9\linewidth}{
+        @{}
+        >{\raggedright\arraybackslash}p{1.8cm}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}X
+        @{}
+    }
+        \toprule
+        \textbf{Solution} &
+        \textbf{Main Strength} &
+        \textbf{Key Limitation} &
+        \textbf{Project Difference} \\
+        \midrule
+        WhatsApp E2EE &
+        Native encryption and key transparency &
+        Platform-dependent &
+        Independent extension keys \\
+
+        Signal Protocol &
+        Ratcheting and forward secrecy &
+        Complex key and state management &
+        Simplified DH--HKDF--AES-GCM \\
+
+        MessageGuard &
+        Reusable encryption overlays &
+        Generic and UI-dependent &
+        WhatsApp Web-specific implementation \\
+
+        EriChain &
+        Message integrity auditing &
+        No message confidentiality &
+        Encrypts message contents \\
+
+        Code Verify &
+        Detects modified web code &
+        No contact-key verification &
+        Adds encryption and key verification \\
+
+        MLS &
+        Scalable group key management &
+        Requires coordinated group state &
+        Focuses on one-to-one messaging \\
+
+        \textbf{Proposed Project} &
+        \textbf{Encryption and contact-key verification} &
+        \textbf{Manual setup; no ratchet or group protocol} &
+        \textbf{WhatsApp Web encryption prototype} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+The suggested MVP would make use of the manual exchange of public keys,
+out-of-band fingerprint verification, ephemeral Diffie-Hellman, HKDF, and AES-GCM in order to add an independent encryption layer to WhatsApp Web.
+However, this solution is lacking the sophisticated key management mechanisms of more developed cryptosystems, such as Signal.
+
+It would be desirable to separate cryptographic functions from web-page scripts as much as possible \cite{chrome-extension-security}. Even with a compromised
+browser, plaintext can be revealed. Moreover, both parties will need a proper extension installed. The evaluation should include encryption, decryption error handling,
+rekeying, UI modifications, and verification functionality.
 
 
 \section{\tb{Methodology}}
@@ -271,6 +361,46 @@ Donald E. Knuth (1986) \emph{The \TeX{} Book}, Addison-Wesley Professional.
 \bibitem{lamport94}
 Leslie Lamport (1994) \emph{\LaTeX: a document preparation system}, Addison
 Wesley, Massachusetts, 2nd ed.
+
+\bibitem{whatsapp-e2ee}
+Meta Engineering. Making messaging interoperability with third parties safe for users in Europe. 2024.
+\url{https://engineering.fb.com/2024/03/06/security/whatsapp-messenger-messaging-interoperability-eu/}
+
+\bibitem{whatsapp-key-transparency}
+Meta Engineering. Deploying key transparency at WhatsApp. 2023.
+\url{https://engineering.fb.com/2023/04/13/security/whatsapp-key-transparency/}
+
+\bibitem{signal-protocol}
+Marlinspike, M., Perrin, T. (eds.). The X3DH Key Agreement Protocol.
+Signal Specifications, 2016.
+\url{https://signal.org/docs/specifications/x3dh/}
+See also: The Double Ratchet Algorithm.
+\url{https://signal.org/docs/specifications/doubleratchet/}
+
+\bibitem{messageguard}
+Ruoti, S., Andersen, J., Monson, T., Zappala, D., Seamons, K.
+MessageGuard: A Browser-based Platform for Usable, Content-Based Encryption Research.
+arXiv:1510.08943, 2015.
+\url{https://arxiv.org/abs/1510.08943}
+
+\bibitem{erichain}
+EriChain Extension. Auditable WhatsApp Web Chats.
+GitHub repository.
+\url{https://github.com/lucca-poli/eris_extension}
+
+\bibitem{code-verify}
+Meta Engineering. Code Verify: An open source browser extension for verifying code authenticity on the web. 2022.
+\url{https://engineering.fb.com/2022/03/10/security/code-verify/}
+
+\bibitem{mls}
+Barnes, R., et al. The Messaging Layer Security (MLS) Protocol.
+RFC 9420, Internet Engineering Task Force, 2023.
+\url{https://www.rfc-editor.org/rfc/rfc9420.html}
+
+\bibitem{chrome-extension-security}
+Chrome for Developers. Stay secure.
+\url{https://developer.chrome.com/docs/extensions/develop/security-privacy/stay-secure}
+
 \end{thebibliography}
 
 \end{document}
