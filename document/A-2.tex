@@ -42,6 +42,7 @@
  Athulya Shaji 9867600\\
  Mohammed Raiyan Diwan 9967679\\
  Pranjal Anupkumar Satpute 9967643\\
+ Chaturthi Ganesh Malvankar 7878503\\
 }
 
 
@@ -49,15 +50,8 @@
 
 \maketitle
 
-\abstract{This project innovatively presents a city to tourists. Each Australian city has attractions including landmarks, buildings, monuments, etc. Currently tourists must browse the Internet or brochures to learn their stories. This is inconvenient during a tour, especially for foreigners. This calls for a convenient and instant information access mechanism. Considering everyone has a smart phone with camera, a mobile application can be developed with our image recognition research. By simply taking a picture of an attraction, tourists can instantly access its story, presented visually or verbally in their mother tongue. Functions such as photo-sharing and local advertisements can be added.
+\abstract{People now send personal, academic, and work messages through web chat, so confidentiality depends on who holds the keys, not only on a platform saying that traffic is protected. WhatsApp already encrypts chats inside its own clients. This project does not replace that protection, and it does not treat WhatsApp as insecure. On WhatsApp Web, a user cannot run a separate encryption step, with keys held only by a browser extension, before the page sends the text. This project proposes a Chrome extension that adds an experimental extra layer to one-to-one text. In the first phase, keys stay in the browser and are not stored on a project server. Each user has an ECDH P-256 key pair. From the popup, the user can turn the extra encryption on or off, see the current status, copy the local public key, paste the other person's public key, and get a warning when a required key is missing. The two browsers derive a shared secret and then an AES-256-GCM key with HKDF and SHA-256, using a new random IV for each message. On send, the extension reads the compose box and replaces the plaintext before WhatsApp transmits it. If encryption fails, the plaintext is not sent. On receipt, the extension finds the payload in the open chat and decrypts it locally. The result is a testable client-side workflow on an existing web messenger, and a clear limit of manual key exchange: a pasted key is not yet evidence of the right person. Key checks, separate keys per contact, rotation, and group chats are left to a later phase.
 
-\tr{Fuchun: Put the paragraph of project description here. It should cover
-\begin{itemize}
-\item the background, 
-\item the current solution and its disadvantages (that you focus on)
-\item  and what this project will contribute
-\end{itemize}
-You must edit the proposal in this template, not other templates. Pls contact Fuchun if you don't know how to complete the second assignment.
 }
 
 \newpage
@@ -72,7 +66,7 @@ Hazel Dube &  100$\%$ \\
 Athulya Shaji &  100$\%$ \\
 Mohammed Raiyan Diwan &  100$\%$ \\
 Pranjal Anupkumar Satpute &  100$\%$ \\
-Name 6&  100$\%$ \\ \hline
+Chaturthi Ganesh Malvankar &  100$\%$ \\ \hline
 \end{tabular}
 \end{center}
 
