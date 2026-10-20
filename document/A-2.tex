@@ -37,6 +37,7 @@
 
 
 \author{
+ Vincent James Barila 4491993\\\
  Yining Yang 89628688\\\
  Hazel Dube 9179677\\
  Athulya Shaji 9867600\\
@@ -61,6 +62,7 @@
 \begin{center}
 \begin{tabular}{cc}\hline
 Names & Weights \\ 
+Vincent James Barila & 100$\%$ \\
 Yining Yang &  100$\%$ \\
 Hazel Dube &  100$\%$ \\
 Athulya Shaji &  100$\%$ \\
@@ -342,11 +344,15 @@ The expected outcome of this project is to develop a functioning browser extensi
 \section{\tb{Conclusion}}
  
  
-\tr{You can use any format of the reference as long as consistent. Pls search what is  Latex reference bib
-}
+Overall this project aims to develop an MVP solution on WhatsApp Web and Google Chrome as a web browser extension that adds an additional and experimental layer of client-side encryption to direct messaging. By using ECDH for shared-secret establishment, HKDF with SHA-256 for key derivation, and AES-256-GCM for message encryption, the extension will encrypt before transmission and decrypted locally in the recipient's browser. The project will also provide a simple UI for managing encryption settings without requiring a server to store users cryptographic keys.
+	
+The methodology has been discussed which involves developing the extension that adds a client-side encryption layer to WhatsApp Web. The system will consist of an extension control module, a cryptography module, and a user interface, using JavaScript, HTML, CSS, Chrome extension APIs, and the WebCrypto API. Related works such Signal, MessageGuard, EriChain Code Verify and MLS has been discussed.
+	
+The project will be developed in two phases whereas, the first phase will focus on implementing and testing the MVP, including key generation, public-key exchange, message encryption and decryption, and error handling. The second phase will aim to improve the security, reliability, and usability through features such as key verification, key management and key rotation depending on time and feasibility.
+	
+Although the proposed extension introduces an additional layer of encryption, it also presents challenges related to authenticated key exchange, browser security, and integration with WhatsApp Web. In particular, manual public-key exchange and group messaging encryption which may affect the extension's functionality. These limitations will be considered during testing and evaluation.
 
-
-\url{https://www.overleaf.com/learn/latex/Bibliography_management_with_bibtex}
+Finally, the project will provide an implementation of browser extensions which introduces additional client-side encryption into an existing messaging platform WhatsApp Web. By evaluating both the functionality and limitations of the proposed approach, the project aims to establish a foundation for future improvements in browser-based message privacy, key management, and secure communication.
  
  \begin{thebibliography}{9}
 
