@@ -37,11 +37,13 @@
 
 
 \author{
+ Vincent James Barila 4491993\\\
  Yining Yang 89628688\\\
  Hazel Dube 9179677\\
  Athulya Shaji 9867600\\
  Mohammed Raiyan Diwan 9967679\\
  Pranjal Anupkumar Satpute 9967643\\
+ Chaturthi Ganesh Malvankar 7878503\\
 }
 
 
@@ -49,15 +51,8 @@
 
 \maketitle
 
-\abstract{This project innovatively presents a city to tourists. Each Australian city has attractions including landmarks, buildings, monuments, etc. Currently tourists must browse the Internet or brochures to learn their stories. This is inconvenient during a tour, especially for foreigners. This calls for a convenient and instant information access mechanism. Considering everyone has a smart phone with camera, a mobile application can be developed with our image recognition research. By simply taking a picture of an attraction, tourists can instantly access its story, presented visually or verbally in their mother tongue. Functions such as photo-sharing and local advertisements can be added.
+\abstract{People now send personal, academic, and work messages through web chat, so confidentiality depends on who holds the keys, not only on a platform saying that traffic is protected. WhatsApp already encrypts chats inside its own clients. This project does not replace that protection, and it does not treat WhatsApp as insecure. On WhatsApp Web, a user cannot run a separate encryption step, with keys held only by a browser extension, before the page sends the text. This project proposes a Chrome extension that adds an experimental extra layer to one-to-one text. In the first phase, keys stay in the browser and are not stored on a project server. Each user has an ECDH P-256 key pair. From the popup, the user can turn the extra encryption on or off, see the current status, copy the local public key, paste the other person's public key, and get a warning when a required key is missing. The two browsers derive a shared secret and then an AES-256-GCM key with HKDF and SHA-256, using a new random IV for each message. On send, the extension reads the compose box and replaces the plaintext before WhatsApp transmits it. If encryption fails, the plaintext is not sent. On receipt, the extension finds the payload in the open chat and decrypts it locally. The result is a testable client-side workflow on an existing web messenger, and a clear limit of manual key exchange: a pasted key is not yet evidence of the right person. Key checks, separate keys per contact, rotation, and group chats are left to a later phase.
 
-\tr{Fuchun: Put the paragraph of project description here. It should cover
-\begin{itemize}
-\item the background, 
-\item the current solution and its disadvantages (that you focus on)
-\item  and what this project will contribute
-\end{itemize}
-You must edit the proposal in this template, not other templates. Pls contact Fuchun if you don't know how to complete the second assignment.
 }
 
 \newpage
@@ -67,12 +62,13 @@ You must edit the proposal in this template, not other templates. Pls contact Fu
 \begin{center}
 \begin{tabular}{cc}\hline
 Names & Weights \\ 
+Vincent James Barila & 100$\%$ \\
 Yining Yang &  100$\%$ \\
 Hazel Dube &  100$\%$ \\
 Athulya Shaji &  100$\%$ \\
 Mohammed Raiyan Diwan &  100$\%$ \\
 Pranjal Anupkumar Satpute &  100$\%$ \\
-Name 6&  100$\%$ \\ \hline
+Chaturthi Ganesh Malvankar &  100$\%$ \\ \hline
 \end{tabular}
 \end{center}
 
@@ -348,11 +344,15 @@ The expected outcome of this project is to develop a functioning browser extensi
 \section{\tb{Conclusion}}
  
  
-\tr{You can use any format of the reference as long as consistent. Pls search what is  Latex reference bib
-}
+Overall this project aims to develop an MVP solution on WhatsApp Web and Google Chrome as a web browser extension that adds an additional and experimental layer of client-side encryption to direct messaging. By using ECDH for shared-secret establishment, HKDF with SHA-256 for key derivation, and AES-256-GCM for message encryption, the extension will encrypt before transmission and decrypted locally in the recipient's browser. The project will also provide a simple UI for managing encryption settings without requiring a server to store users cryptographic keys.
+	
+The methodology has been discussed which involves developing the extension that adds a client-side encryption layer to WhatsApp Web. The system will consist of an extension control module, a cryptography module, and a user interface, using JavaScript, HTML, CSS, Chrome extension APIs, and the WebCrypto API. Related works such Signal, MessageGuard, EriChain Code Verify and MLS has been discussed.
+	
+The project will be developed in two phases whereas, the first phase will focus on implementing and testing the MVP, including key generation, public-key exchange, message encryption and decryption, and error handling. The second phase will aim to improve the security, reliability, and usability through features such as key verification, key management and key rotation depending on time and feasibility.
+	
+Although the proposed extension introduces an additional layer of encryption, it also presents challenges related to authenticated key exchange, browser security, and integration with WhatsApp Web. In particular, manual public-key exchange and group messaging encryption which may affect the extension's functionality. These limitations will be considered during testing and evaluation.
 
-
-\url{https://www.overleaf.com/learn/latex/Bibliography_management_with_bibtex}
+Finally, the project will provide an implementation of browser extensions which introduces additional client-side encryption into an existing messaging platform WhatsApp Web. By evaluating both the functionality and limitations of the proposed approach, the project aims to establish a foundation for future improvements in browser-based message privacy, key management, and secure communication.
  
  \begin{thebibliography}{9}
 
