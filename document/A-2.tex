@@ -210,28 +210,21 @@ rekeying, UI modifications, and verification functionality.
 
 
 \section{\tb{Methodology}}
-This project will implement an end-to-end encryption layer to web-based messaging via a browser-extension. The goal is to keep messages secure until they're received in the recipient's browser where they'll be decrypted. The extension will function without the need to modify the platform itself and will be independent of the messaging service. In the prototype, the selected platform is WhatsApp Web and platform-specific code is retained to allow the approach to be adapted for other web messaging services later on.
+This project will implement an end-to-end encryption layer to web-based messaging via a browser-extension \cite{chrome-extension-security,phishcatcher2023}. The goal is to keep messages secure until they're received in the recipient's browser where they'll be decrypted. The extension will function without the need to modify the platform itself and will be independent of the messaging service. In the prototype, the selected platform is WhatsApp Web and platform-specific code is retained to allow the approach to be adapted for other web messaging services later on \cite{messageguard}.
 
+The system will be segmented into three sections: extension control module, cryptography module and user interface module. The extension control module will handle the communication between webpage and extension. A content script will be used to track message related actions, and a separate adapter will be used to perform platform specific DOM operations like reading and replacing the content of the message, checking if a conversation is active, and checking for new messages. These operations will be linked with cryptography functions by the background controller. This segregation of the encryption logic from the messaging interface simplifies testing and maintenance and ensures the system's encryption capabilities remain independent of the messaging interface \cite{chrome-extension-security}.
 
-The system will be segmented into three sections: extension control module, cryptography module and user interface module. The extension control module will handle the communication between webpage and extension. A content script will be used to track message related actions, and a separate adapter will be used to perform platform specific DOM operations like reading and replacing the content of the message, checking if a conversation is active, and checking for new messages. These operations will be linked with cryptography functions by the background controller. This segregation of the encryption logic from the messaging interface simplifies testing and maintenance and ensures the system's encryption capabilities remain independent of the messaging interface.
+The cryptography module will use the Web Crypto API. During Phase 1, each user will have a public and a private key pair, where each key pair is an ECDH key pair. Private key will not be shared or exchanged between the browser extension and other parties. Public keys will be initially exchanged manually via the popup. Each side will then use its own private key and other user's public key to calculate the same shared secret \cite{signal-protocol,imauth2024}. This common secret will be used to derive an AES-256 key for HKDF with the SHA-256 hash function.
 
+AES-GCM will be used to protect the content of the message as it offers confidentiality and integrity checking. New random IV will be created for each message. The encrypted data will be encased with information needed for decryption such as message version, IV, cipher text and other data. The payload will be Base64 encoded binary in order to be able to be sent as normal text. Decryption should fail if the ciphertext, key, or authentication information is invalid, and should not return invalid plaintext \cite{cfe2024}.
 
-The cryptography module will use the Web Crypto API. During Phase 1, each user will have a public and a private key pair, where each key pair is an ECDH key pair. Private key will not be shared or exchanged between the browser extension and other parties. Public keys will be initially exchanged manually via the popup. Each side will then use its own private key and other user's public key to calculate the same shared secret. This common secret will be used to derive an AES-256 key for HKDF with the SHA-256 hash function.
+The extension will recognize the sending action before the plaintext is sent for outgoing messages. The message will be sent to the background controller for encryption, and the plaintext will be substituted with the encrypted payload before the platform completes the send operation. If the encryption is unsuccessful, the plain text should not be transmitted. Incoming messages will be decrypted and presented locally by the extension if they are in the ``encrypted message'' format. The user will also be informed about errors, like missing or wrong keys, invalid payloads or failed authentication.
 
+Phase 2 will further improve the one-to-one workflow with enhanced key management capabilities and support for more realistic messaging scenarios. Each contact will have their own key, so that the cryptographic material used in one conversation is not used in another. The encrypted message format shall contain key and version information to be used during decryption to find the right key. Key rotation is scheduled for every 24 hours, and new messages are created with the new key, while old messages are bound to the key version they were created with \cite{signal-double-ratchet,doubleratchet2026}. Other enhancements that are planned are public-key fingerprints, key-change warnings, replay protection, safer local storage, authenticated key exchange, and encrypted group messaging \cite{whatsapp-key-transparency,mls,groupkey2024}.
 
-AES-GCM will be used to protect the content of the message as it offers confidentiality and integrity checking. New random IV will be created for each message. The encrypted data will be encased with information needed for decryption such as message version, IV, cipher text and other data. The payload will be Base64 encoded binary in order to be able to be sent as normal text. Decryption should fail if the ciphertext, key, or authentication information is invalid, and should not return invalid plaintext.
+The user interface will be flexible enough that the user does not need to be aware of cryptographic details to follow the security workflow. The popup will let users enable or disable the extension, check if it is encrypted, view and copy the user's public key, and type the other user's public key. The chat interface will indicate if it is being encrypted or not and will show the decrypted text and helpful error messages. Later versions may also display key-verification status, fingerprints and key-change warnings \cite{whatsapp-key-transparency}.
 
-
-The extension will recognize the sending action before the plaintext is sent for outgoing messages. The message will be sent to the background controller for encryption, and the plaintext will be substituted with the encrypted payload before the platform completes the send operation. If the encryption is unsuccessful, the plain text should not be transmitted. Incoming messages will be decrypted and presented locally by the extension if they are in the "encrypted message" format. The user will also be informed about errors, like missing or wrong keys, invalid payloads or failed authentication.
-
-
-Phase 2 will further improve the one-to-one workflow with enhanced key management capabilities and support for more realistic messaging scenarios. Each contact will have their own key, so that the cryptographic material used in one conversation is not used in another. The encrypted message format shall contain key and version information to be used during decryption to find the right key. Key rotation is scheduled for every 24 hours, and new messages are created with the new key, while old messages are bound to the key version they were created with. Other enhancements that are planned are public-key fingerprints, key-change warnings, replay protection, safer local storage, authenticated key exchange, and encrypted group messaging.
-
-
-The user interface will be flexible enough that the user does not need to be aware of cryptographic details to follow the security workflow. The popup will let users enable or disable the extension, check if it is encrypted, view and copy the user's public key, and type the other user's public key. The chat interface will indicate if it is being encrypted or not and will show the decrypted text and helpful error messages. Later versions may also display key-verification status, fingerprints and key-change warnings.
-
-
-Development and testing will use JavaScript, WebExtensions/Chrome extension APIs, the Web Crypto API, DOM manipulation, Visual Studio Code, Git, and GitHub. Encryption and decryption will be tested, along with IV uniqueness, wrong-key failure, malformed payloads, modified ciphertext, different message lengths, emojis, symbols and multiline text. End to end testing will involve the use of individual browser profiles to simulate individual users and will include tests for sending, receiving, extension restarts and failure handling. Future tests will cover several contacts, key rotation, replaying attempts, group messaging, browser support, and performance. The final evaluation will consider security, usability, reliability, and practical limitations of adding further E2EE in a browser extension.
+Development and testing will use JavaScript, WebExtensions/Chrome extension APIs, the Web Crypto API, DOM manipulation, Visual Studio Code, Git, and GitHub \cite{chrome-extension-security}. Encryption and decryption will be tested, along with IV uniqueness, wrong-key failure, malformed payloads, modified ciphertext, different message lengths, emojis, symbols and multiline text. End to end testing will involve the use of individual browser profiles to simulate individual users and will include tests for sending, receiving, extension restarts and failure handling. Future tests will cover several contacts, key rotation, replaying attempts, group messaging, browser support, and performance. The final evaluation will consider security, usability, reliability, and practical limitations of adding further E2EE in a browser extension.
 
 \subsection{Project Challenges}
  \textbf{Authenticated Key Exchange}
@@ -391,6 +384,26 @@ R. Barnes et al., ``The Messaging Layer Security (MLS) Protocol,'' IETF RFC 9420
 \bibitem{chrome-extension-security}
 Chrome for Developers, ``Stay secure,'' Chrome Extensions Documentation. [Online]. Available: 
 \url{https://developer.chrome.com/docs/extensions/develop/security-privacy/stay-secure}. 
+
+\bibitem{phishcatcher2023}
+M. Ahmed, A. B. Altamimi, W. Khan, M. S. Alsaffar, A. Ahmad, Z. H. Khan, and A. Alreshidi, ``PhishCatcher: Client-Side Defense Against Web Spoofing Attacks Using Machine Learning,'' \textit{IEEE Access}, vol. 11, pp. 61249--61263, 2023. [Online]. Available:
+\url{https://ieeexplore.ieee.org/document/10155142/}.
+
+\bibitem{imauth2024}
+D. A. Cordova Morales, A. S. Wazan, R. Laborde, M. I. Taj, A. Habbal, and G. Gallegos-Garcia, ``Towards the Removal of Identification and Authentication Authority from IM Systems,'' in \textit{Proc. 2024 8th Cyber Security in Networking Conference (CSNet)}, Paris, France, 2024, pp. 243--247. [Online]. Available:
+\url{https://ieeexplore.ieee.org/document/10851747/}.
+
+\bibitem{cfe2024}
+T. V. X. Phuong, A. Baker, P. D. Huff, J. P. Springer, and T. T. N. Le, ``CFE: Secure Filtered Words in End-to-End Encrypted Messaging System,'' in \textit{Proc. 2024 IEEE 23rd International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom)}, Sanya, China, 2024. [Online]. Available:
+\url{https://ieeexplore.ieee.org/document/10944856/}.
+
+\bibitem{groupkey2024}
+Y. Hanna, M. Cebe, J. Leon, and K. Akkaya, ``Efficient Group Key Management for Resilient Operation of LoRaWAN-Based Smart Grid Applications,'' \textit{IEEE Transactions on Control Systems Technology}, vol. 32, no. 5, pp. 1706--1717, Sep. 2024. [Online]. Available:
+\url{https://ieeexplore.ieee.org/document/10490239/}.
+
+\bibitem{doubleratchet2026}
+V. Cheval, C. Jacomme, and J. Richards, ``Automated Formal Analysis of Signal's Double Ratchet: Attacks, Fixes and Security Proofs,'' in \textit{Proc. 2026 IEEE Symposium on Security and Privacy (SP)}, San Francisco, CA, USA, 2026, pp. 1522--1538. [Online]. Available:
+\url{https://ieeexplore.ieee.org/document/11573624/}.
 
 \end{thebibliography}
 
