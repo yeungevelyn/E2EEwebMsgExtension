@@ -74,15 +74,48 @@ function handleMessages(message, sender, sendResponse) {
 
             return;
         }else if(message.type==='ENCRYPT_MESSAGE'){
-            sendResponse({
-                status: 0,
-                requestId: message.requestId,
-                data: {
-                    "encryptedPayload":""
-                }
-            });
+            const plaintext = message.payload.plaintext
+            if(plaintext === null){
+                return;
+            }
 
-            return;
+            (async () => {
+                try {
+                    const encryptedPayload =
+                        await globalThis.E2EECrypto.encryptMessage(
+                            plaintext,
+                            testKey
+                        );
+
+                    const ciphertext =
+                        globalThis.E2EECrypto.encodeMessagePayload(
+                            encryptedPayload
+                        );
+
+                    // send success response to content
+                    sendResponse({
+                        status: 0,
+                        requestId: message.requestId,
+                        data: {
+                            "ciphertext": ciphertext
+                        }
+                    });
+                }catch(error){
+                    // send fail
+                    sendResponse({
+                        status: 1,
+                        requestId: message.requestId,
+                        error: {
+                            code: 102,
+                            message: error.message
+                        }
+                    });
+                }
+
+            })();
+
+            return true;
+
         } else if(message.type==='DECRYPT_MESSAGE'){
             sendResponse({
                 status: 0,

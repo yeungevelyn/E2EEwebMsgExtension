@@ -93,11 +93,24 @@ function replaceInputContent(newText){
     return replaced;
 }
 
+function sendCurrentMessage(){
+    const button =getSendButton();
+    if(!button){
+        return false;
+    }else{
+        // click button
+        button.click();
+        return true;
+    }
+
+}
+
 globalThis.whatsappAdapter = {
     getMessageInput,
     getSendButton,
     getActiveConversation,
     getDisplayedMessages,
     readInputContent,
-    replaceInputContent
+    replaceInputContent,
+    sendCurrentMessage
 };
