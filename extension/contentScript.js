@@ -1,5 +1,7 @@
 // WhatsApp Web content-script entry point.
 
+let enabled = null;
+
 // process lock
 let isProcessingSend = false;
 //  the lock for whether extension needs to send msg
@@ -138,6 +140,10 @@ function handleOutgoingSend(event, triggerType){
     // Intercept the original send action
       if(isProcessingSend === false && isResumingSend=== false){
 
+          if (!enabled) {
+              return;
+          }
+
           event.preventDefault();
           event.stopImmediatePropagation();
           console.log("[E2EE] Send intercepted:", triggerType);
@@ -253,9 +259,41 @@ function handleOutgoingSend(event, triggerType){
 
 }
 
+// get extension state
+async function loadExtensionState() {
+    const request = {
+        type: "GET_EXTENSION_STATE",
+        requestId: crypto.randomUUID(),
+        payload: {}
+    };
+
+    const response = await browser.runtime.sendMessage(request);
+
+    if (!response || response.status !== 0) {
+        throw new Error(
+            response?.error?.message ||
+            "Could not load extension state"
+        );
+    }
+    // get user's enable state
+    enabled = response.data.enabled;
+
+}
+// change enable state
+browser.storage.onChanged.addListener(
+    (changes, areaName) => {
+        if ( areaName === "local" && typeof changes.encryptionEnabled?.newValue === "boolean") {
+            enabled = changes.encryptionEnabled.newValue;
+        }
+    }
+);
+
 initialiseMessageInput();
 
 initialiseMessageSend();
 
+loadExtensionState().catch((error) => {
+    console.error("[E2EE] Unable to load extension state:", error);
+});
 
 
