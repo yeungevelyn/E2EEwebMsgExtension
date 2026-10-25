@@ -163,6 +163,7 @@ function handleMessages(message, sender, sendResponse) {
                         message: "Invalid plaintext"
                     }
                 });
+                return;
             }
 
             (async () => {
