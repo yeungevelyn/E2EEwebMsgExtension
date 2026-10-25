@@ -1,18 +1,35 @@
-
 /**
  * Public-key export and import for the E2EE extension.
  *
  * Algorithm: ECDH
  * Curve: P-256
  *
- * This module handles public keys only. Private keys must never
- * be included in an exported public-key bundle.
+ * Bundle format, validation and fingerprint match E2EEKeyManager, so a bundle
+ * from either side is accepted by the other. This module handles public keys
+ * only. Private keys must never be included in an exported public-key bundle.
  */
 
-const KEY_FORMAT = "E2EE-PUBLIC-KEY";
+const KEY_FORMAT = "E2EEwebMsgExtension-public-key";
 const KEY_VERSION = 1;
 const KEY_ALGORITHM = "ECDH";
 const KEY_CURVE = "P-256";
+
+/**
+ * Fingerprint of a public JWK. Same canonical string and colon-hex output
+ * as E2EEKeyManager.fingerprintPublicJwk.
+ */
+async function fingerprintPublicJwk(jwk) {
+  const canonical = new TextEncoder().encode(
+    `${jwk.kty}|${jwk.crv}|${jwk.x}|${jwk.y}`
+  );
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", canonical));
+
+  return Array.from(digest, (byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .match(/.{2}/g)
+    .join(":")
+    .toUpperCase();
+}
 
 /**
  * Export an ECDH public key into a JSON string that can be shared.
@@ -32,25 +49,28 @@ export async function exportPublicKey(publicKey) {
     throw new TypeError("Expected an ECDH P-256 public key.");
   }
 
-  const jwk = await crypto.subtle.exportKey("jwk", publicKey);
+  const exported = await crypto.subtle.exportKey("jwk", publicKey);
 
   // Export only the public components.
+  const jwk = {
+    kty: exported.kty,
+    crv: exported.crv,
+    x: exported.x,
+    y: exported.y,
+    ext: true,
+    key_ops: []
+  };
+
   const bundle = {
     format: KEY_FORMAT,
     version: KEY_VERSION,
     algorithm: KEY_ALGORITHM,
     curve: KEY_CURVE,
-    publicKey: {
-      kty: jwk.kty,
-      crv: jwk.crv,
-      x: jwk.x,
-      y: jwk.y,
-      ext: true,
-      key_ops: []
-    }
+    publicKey: jwk,
+    fingerprint: await fingerprintPublicJwk(jwk)
   };
 
-  return JSON.stringify(bundle);
+  return JSON.stringify(bundle, null, 2);
 }
 
 /**
@@ -111,7 +131,19 @@ export async function importPublicKey(bundleText) {
     jwk.x.length === 0 ||
     jwk.y.length === 0
   ) {
+    
     throw new TypeError("Invalid ECDH P-256 public-key data.");
+  }
+
+  // If the bundle carries a fingerprint, it must match the key data.
+  // (A missing fingerprint is accepted, same as the key manager.)
+  if (bundle.fingerprint) {
+    const actual = await fingerprintPublicJwk(jwk);
+    if (bundle.fingerprint !== actual) {
+      throw new Error(
+        "Public-key fingerprint does not match the key data; do not import this bundle."
+      );
+    }
   }
 
   // Import as a non-extractable public key.
