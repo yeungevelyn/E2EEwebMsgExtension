@@ -257,7 +257,7 @@ function handleMessages(message, sender, sendResponse) {
                 }
             })();
             return true;
-        } else if(message.type = "SAVE_PEER_PUBLIC_KEY"){
+        } else if(message.type === "SAVE_PEER_PUBLIC_KEY"){
             // get publick key
             const publicKeyBundle = message.payload?.publicKeyBundle;
             // validation
