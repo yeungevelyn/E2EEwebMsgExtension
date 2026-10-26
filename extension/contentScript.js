@@ -258,7 +258,42 @@ function handleOutgoingSend(event, triggerType){
 
 
 }
+async function loadChatUIStatus() {
 
+    try {
+        const stateResponse = await browser.runtime.sendMessage({
+            type: "GET_EXTENSION_STATE",
+            requestId: crypto.randomUUID(),
+            payload: {}
+        });
+
+        if (!stateResponse || stateResponse.status !== 0) {
+            throw new Error("Could not load extension state");
+        }
+
+        const keyResponse = await browser.runtime.sendMessage({
+            type: "GET_KEY_STATUS",
+            requestId: crypto.randomUUID(),
+            payload: {}
+        });
+
+        if (!keyResponse || keyResponse.status !== 0) {
+            throw new Error("Could not load key status");
+        }
+
+        globalThis.extraE2EEChatUI?.updateEncryptionStatus(
+            stateResponse.data.enabled,
+            keyResponse.data
+        );
+
+    } catch (error) {
+        console.error("[E2EE] Unable to update chat UI status:", error);
+
+        globalThis.extraE2EEChatUI?.displayError(
+            "Could not retrieve encryption status."
+        );
+    }
+}
 // get extension state
 async function loadExtensionState() {
     const request = {
@@ -280,13 +315,20 @@ async function loadExtensionState() {
 
 }
 // change enable state
-browser.storage.onChanged.addListener(
-    (changes, areaName) => {
-        if ( areaName === "local" && typeof changes.encryptionEnabled?.newValue === "boolean") {
-            enabled = changes.encryptionEnabled.newValue;
-        }
+browser.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "local") {
+        return;
     }
-);
+
+    if (typeof changes.encryptionEnabled?.newValue === "boolean") {
+        enabled = changes.encryptionEnabled.newValue;
+        loadChatUIStatus();
+    }
+
+    if (changes.peerKeyUpdatedAt) {
+        loadChatUIStatus();
+    }
+});
 
 initialiseMessageInput();
 
@@ -295,5 +337,7 @@ initialiseMessageSend();
 loadExtensionState().catch((error) => {
     console.error("[E2EE] Unable to load extension state:", error);
 });
+
+loadChatUIStatus();
 
 

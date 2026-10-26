@@ -6,6 +6,10 @@
 
     let lastConversationName = null;
 
+    let latestEncryptionState = null;
+
+    let latestKeyStatus = null;
+
     function createStatusBanner() {
         const banner = document.createElement("div");
 
@@ -22,6 +26,50 @@
         banner.append(heading, description);
 
         return banner;
+    }
+
+    function updateEncryptionStatus(enabled, keyStatus) {
+    latestEncryptionState = enabled;
+    latestKeyStatus = keyStatus;
+
+    const banner = document.getElementById("extra-e2ee-status");
+    const notice = document.getElementById("extra-e2ee-outgoing");
+
+    if (!banner) {
+        return;
+    }
+
+    const heading = banner.querySelector("strong");
+    const description = banner.querySelector("span");
+
+    if (!heading || !description) {
+        return;
+    }
+
+    if (!enabled) {
+        heading.textContent = "🔓 Extra E2EE — Disabled";
+        description.textContent = "Additional encryption is turned off";
+
+        if (notice) {
+            notice.textContent = "🛡️ Extra E2EE: Outgoing encryption disabled";
+        }
+
+    } else if (!keyStatus?.peerKeyReady || !keyStatus?.sessionReady) {
+        heading.textContent = "🔒 Extra E2EE — Not ready";
+        description.textContent = "Encryption keys or session are not ready";
+
+        if (notice) {
+            notice.textContent = "🛡️ Extra E2EE: Encryption not ready";
+        }
+
+    } else {
+        heading.textContent = "🔒 Extra E2EE — Ready";
+        description.textContent = "Additional encryption is ready";
+
+        if (notice) {
+            notice.textContent = "🛡️ Extra E2EE: Encryption ready";
+            }
+        }
     }
 
     function createOutgoingNotice() {
@@ -248,6 +296,11 @@
             composer.insertAdjacentElement("afterbegin", notice);
         }
 
+        // Reapply the latest encryption status.
+        if (latestEncryptionState !== null) {
+            updateEncryptionStatus(latestEncryptionState, latestKeyStatus);
+        }
+
     }
 
     // WhatsApp changes its interface dynamically.
@@ -277,8 +330,8 @@
     // Allow other extension content scripts to use the Chat UI.
     globalThis.extraE2EEChatUI = {
         displayDecryptedMessage,
-        displayError
+        displayError,
+        updateEncryptionStatus
     };
-
 
 })();
