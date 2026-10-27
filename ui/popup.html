@@ -23,7 +23,7 @@
 
     <h2>Your Public Key </h2>
     
-    <textarea id="publicKey" row="4" readonly
+    <textarea id="publicKey" rows="4" readonly
         placeholder="No public key available"></textarea>
 
     <button id="copyPublicKey">Copy Public Key</button>
@@ -38,6 +38,14 @@
     <button id="saveRecipientKey">Save Recipient Key</button>
 
     <p id="recipientKeyMessage"></p>
+
+    <h2>Key Status</h2>
+
+    <p>Your key: <span id="identityKeyStatus">Checking...</span></p>
+
+    <p>Recipient's key: <span id="peerKeyStatus">Checking...</span></p>
+
+    <p>Encryption session: <span id="sessionKeyStatus">Checking...</span></p>
 
     <script src="../crypto/keyManager.js"></script>
     <script src="popup.js"></script>
