@@ -25,6 +25,7 @@
       ],
       "js": [
         "extension/whatsappAdapter.js",
+        "extension/incomingMessages.js",
         "ui/chat-ui.js",
         "extension/contentScript.js"
       ],
