@@ -1,31 +1,31 @@
 // Chrome extension background entry point.
 import "../crypto/keyManager.js";
 import "../crypto/crypto.js";
+import "./sessionExchange.js";
 
 
 let enabled = false;
 let cryptoReady = false;
 let sessionReady = false;
-let testKey = null;
+
 
 //test key
 async function initialiseCrypto() {
     const originalText = "Crypto readiness test";
 
     try {
-        testKey =
-            await globalThis.E2EECrypto.generateTestKey();
+        const selfTestKey = await globalThis.E2EECrypto.generateTestKey();
 
         const encryptedPayload =
             await globalThis.E2EECrypto.encryptMessage(
                 originalText,
-                testKey
+                selfTestKey
             );
 
         const decryptedText =
             await globalThis.E2EECrypto.decryptMessage(
                 encryptedPayload,
-                testKey
+                selfTestKey
             );
 
         cryptoReady =
@@ -37,7 +37,6 @@ async function initialiseCrypto() {
         );
     } catch (error) {
         cryptoReady = false;
-        testKey = null;
 
         console.error(
             "[E2EE Background] Crypto initialisation failed:",
@@ -132,6 +131,7 @@ function handleMessages(message, sender, sendResponse) {
             (async () => {
                 try {
                     await extensionStateReady;
+                    await cryptoReadyPromise;
 
                     sendResponse({
                         status: 0,
@@ -228,18 +228,23 @@ function handleMessages(message, sender, sendResponse) {
                         );
                     }
 
-                    if (!cryptoReady || !testKey) {
+                    await cryptoReadyPromise;
+
+                    if(!cryptoReady){
+                        throw new Error("Encryption is not ready");
+                    }
+
+                    if (!globalThis.E2EESession) {
                         throw new Error(
-                            "Encryption is not ready"
+                            "Session manager is unavailable"
                         );
                     }
 
                     const encryptedPayload =
-                        await globalThis.E2EECrypto.encryptMessage(
-                            plaintext,
-                            testKey
+                        await globalThis.E2EESession.encryptOutgoing(
+                            plaintext
                         );
-
+                    sessionReady = true;
                     const ciphertext =
                         globalThis.E2EECrypto.encodeMessagePayload(
                             encryptedPayload
@@ -364,13 +369,17 @@ function handleMessages(message, sender, sendResponse) {
             (async () => {
                 try {
                     const savedPeer = await globalThis.E2EEKeyManager.savePeerPublicKey(publicKeyBundle);
+                    // reset session after key changes
+                    await globalThis.E2EESession.resetSession();
+                    sessionReady = false;
 
                     sendResponse({
                         status: 0,
                         requestId: message.requestId,
                         data: {
                             fingerprint: savedPeer.fingerprint,
-                            peerKeyReady: true
+                            peerKeyReady: true,
+                            sessionReady: false
                         }
                     });
                 } catch (error) {
@@ -398,6 +407,8 @@ function handleMessages(message, sender, sendResponse) {
                     const identityKeyReady = Boolean(identity?.privateKey && identity?.publicKey);
 
                     const peerKeyReady = Boolean(peer?.publicKey);
+
+                    sessionReady = await globalThis.E2EESession.isSessionReady();
 
                     sendResponse({
                         status: 0,
@@ -438,5 +449,5 @@ function handleMessages(message, sender, sendResponse) {
 }
 
 browser.runtime.onMessage.addListener(handleMessages);
-initialiseCrypto();
+const cryptoReadyPromise = initialiseCrypto();
 const extensionStateReady = initialiseExtensionState();
