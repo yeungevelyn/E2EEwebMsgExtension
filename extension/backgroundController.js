@@ -1,10 +1,7 @@
 // Chrome extension background entry point.
 import "../crypto/keyManager.js";
 import "../crypto/crypto.js";
-import {
-  exportPublicKey,
-  importPublicKey
-} from "../crypto/keyExchange.js";
+
 
 let enabled = false;
 let cryptoReady = false;
@@ -443,32 +440,3 @@ function handleMessages(message, sender, sendResponse) {
 browser.runtime.onMessage.addListener(handleMessages);
 initialiseCrypto();
 const extensionStateReady = initialiseExtensionState();
-
-
-globalThis.E2EEKeyExchange = {
-  exportPublicKey,
-  importPublicKey,
-
-  async runSelfTest() {
-    const keyPair = await crypto.subtle.generateKey(
-      {
-        name: "ECDH",
-        namedCurve: "P-256"
-      },
-      true,
-      ["deriveBits"]
-    );
-
-    const bundle = await exportPublicKey(keyPair.publicKey);
-    const importedKey = await importPublicKey(bundle);
-
-    const passed =
-      importedKey.type === "public" &&
-      importedKey.algorithm.name === "ECDH" &&
-      importedKey.algorithm.namedCurve === "P-256";
-
-    console.log("Public-key export/import successful:", passed);
-
-    return passed;
-  }
-};
