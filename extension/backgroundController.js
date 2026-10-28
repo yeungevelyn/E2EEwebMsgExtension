@@ -109,8 +109,8 @@ async function getDecryptionKey(payload) {
         }
     }
     // Temporary Phase 1 path: the same test key the encrypt branch uses.
-    if (!cryptoReady || !testKey) throw decryptError(302, "Decryption is not ready.");
-    return testKey;
+    // No session data in the message, so it can't be decrypted.
+    throw decryptError(301, "Encrypted message has no session data.");
 }
 
 // Event listener
@@ -264,7 +264,7 @@ function handleMessages(message, sender, sendResponse) {
                         status: 1,
                         requestId: message.requestId,
                         error: {
-                            code: 102,
+                            code: error.code ?? 102,
                             message: error.message
                         }
                     });

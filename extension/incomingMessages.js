@@ -12,7 +12,7 @@
     // While the temporary shared test key is in use, your own sent messages can be
     // decrypted too, which is the only way to test on a single account. Set this to
     // false once real directional session keys are used 
-    const INCLUDE_OUTGOING = true;
+    const INCLUDE_OUTGOING = false;
 
     // Duplicate protection.
     const processed = new Set();
